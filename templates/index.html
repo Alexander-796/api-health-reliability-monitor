@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>API Monitor | Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+
+            <div class="brand-icon">
+                ◉
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    API Monitor
+                </div>
+
+                <div class="brand-subtitle">
+                    Reliability Dashboard
+                </div>
+            </div>
+
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/" class="nav-link active">
+                Dashboard
+            </a>
+
+            <a href="/check-all" class="nav-link">
+                Check All
+            </a>
+
+        </div>
+
+
+        <div class="system-status">
+
+            <span class="online-dot"></span>
+
+            System Online
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main-container">
+
+
+    <!-- PAGE HEADER -->
+
+    <section class="page-header">
+
+        <div>
+
+            <div class="eyebrow">
+                API OBSERVABILITY
+            </div>
+
+            <h1>
+                API Health & Reliability
+            </h1>
+
+            <p>
+                Monitor availability, response time and reliability
+                across your registered APIs.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= SUMMARY CARDS ================= -->
+
+    <section class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                #
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    TOTAL APIs
+                </span>
+
+                <strong class="stat-number">
+                    {{ total_apis }}
+                </strong>
+
+                <span class="stat-description">
+                    Registered endpoints
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                ✓
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    HEALTHY APIs
+                </span>
+
+                <strong class="stat-number green-text">
+                    {{ healthy_apis }}
+                </strong>
+
+                <span class="stat-description">
+                    Currently operational
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon red">
+                !
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    DOWN APIs
+                </span>
+
+                <strong class="stat-number red-text">
+                    {{ down_apis }}
+                </strong>
+
+                <span class="stat-description">
+                    Require attention
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon gray">
+                ◷
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    NOT CHECKED
+                </span>
+
+                <strong class="stat-number gray-text">
+                    {{ unchecked_apis }}
+                </strong>
+
+                <span class="stat-description">
+                    Awaiting first check
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= REGISTER API ================= -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="section-label">
+                    CONFIGURATION
+                </div>
+
+                <h2>
+                    Register New API
+                </h2>
+
+                <p>
+                    Add an endpoint to start monitoring its health.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if request.args.get("error") == "duplicate" %}
+
+            <div class="alert error">
+                <strong>API already registered.</strong>
+                This URL is already being monitored.
+            </div>
+
+        {% endif %}
+
+
+        <form action="/add"
+              method="POST"
+              class="register-form">
+
+            <div class="input-group">
+
+                <label for="name">
+                    API Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Payment API"
+                    required
+                >
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label for="url">
+                    API Endpoint
+                </label>
+
+                <input
+                    type="url"
+                    id="url"
+                    name="url"
+                    placeholder="https://api.example.com/health"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit"
+                    class="primary-button">
+
+                + Register API
+
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================= MONITORING TABLE ================= -->
+
+    <section class="panel">
+
+        <div class="panel-header monitoring-header">
+
+            <div>
+
+                <div class="section-label">
+                    LIVE MONITORING
+                </div>
+
+                <h2>
+                    Registered APIs
+                </h2>
+
+                <p>
+                    View the latest health and performance information.
+                </p>
+
+            </div>
+
+
+            <a href="/check-all"
+               class="secondary-button">
+
+                ↻ Check All APIs
+
+            </a>
+
+        </div>
+
+
+        {% if apis %}
+
+        <div class="table-wrapper">
+
+            <table class="api-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>API</th>
+                        <th>ENDPOINT</th>
+                        <th>STATUS</th>
+                        <th>RESPONSE</th>
+                        <th>HTTP</th>
+                        <th>LAST CHECKED</th>
+                        <th>ACTIONS</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for api in apis %}
+
+                    <tr>
+
+                        <!-- API NAME -->
+
+                        <td>
+
+                            <div class="api-name">
+
+                                <span class="api-number">
+                                    #{{ api["id"] }}
+                                </span>
+
+                                <strong>
+                                    {{ api["name"] }}
+                                </strong>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- URL -->
+
+                        <td>
+
+                            <div class="endpoint"
+                                 title="{{ api['url'] }}">
+
+                                {{ api["url"] }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if api["status"] == "UP" %}
+
+                                <span class="status-badge operational">
+                                    <span class="status-dot"></span>
+                                    Operational
+                                </span>
+
+                            {% elif api["status"] == "DOWN" %}
+
+                                <span class="status-badge down">
+                                    <span class="status-dot"></span>
+                                    Down
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge unchecked">
+                                    <span class="status-dot"></span>
+                                    Not Checked
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- RESPONSE TIME -->
+
+                        <td>
+
+                            {% if api["response_time"] is not none %}
+
+                                <span class="response-time">
+                                    {{ "%.2f"|format(api["response_time"]) }}
+                                </span>
+
+                                <span class="unit">
+                                    ms
+                                </span>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- HTTP STATUS -->
+
+                        <td>
+
+                            {% if api["status_code"] %}
+
+                                <span class="http-code">
+                                    {{ api["status_code"] }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- LAST CHECKED -->
+
+                        <td>
+
+                            {% if api["last_checked"] %}
+
+                                <span class="last-checked">
+                                    {{ api["last_checked"] }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+                        <td class="actions">
+
+                            <a
+                                href="/check/{{ api['id'] }}"
+                                class="check-button">
+                                Check
+                            </a>
+
+                            <a
+                                href="/history/{{ api['id'] }}"
+                                class="check-button">
+                                History
+                            </a>
+
+                            <a
+                                href="/analytics/{{ api['id'] }}"
+                                class="check-button">
+                                Analytics
+                            </a>
+
+                            <form
+                                action="/delete/{{ api['id'] }}"
+                                method="POST"
+                                class="delete-form"
+                                onsubmit="return confirm('Are you sure you want to delete this API?');">
+
+                                <button
+                                    type="submit"
+                                    class="delete-button">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    +
+                </div>
+
+                <h3>
+                    No APIs registered
+                </h3>
+
+                <p>
+                    Register your first API above to begin monitoring.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="footer">
+
+        <span>
+            API Health & Reliability Monitor
+        </span>
+
+        <span>
+            Flask · SQLite · Python
+        </span>
+
+    </footer>
+
+</main>
+
+
+
+</body>
+
+</html>

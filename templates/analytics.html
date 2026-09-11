@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ api["name"] }} | Analytics
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+
+            <div class="brand-icon">
+                ◉
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    API Monitor
+                </div>
+
+                <div class="brand-subtitle">
+                    Reliability Dashboard
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="/check-all" class="nav-link">
+                Check All
+            </a>
+
+        </div>
+
+
+        <div class="system-status">
+
+            <span class="online-dot"></span>
+
+            System Online
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main-container">
+
+
+    <section class="page-header">
+
+        <div class="eyebrow">
+            API ANALYTICS
+        </div>
+
+        <h1>
+            {{ api["name"] }}
+        </h1>
+
+        <p>
+            Reliability and performance analytics
+            for {{ api["url"] }}
+        </p>
+
+    </section>
+
+
+    <!-- ================= ANALYTICS CARDS ================= -->
+
+    <section class="analytics-grid">
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-label">
+                Availability
+            </div>
+
+            <div class="analytics-value green">
+
+                {{ "%.2f"|format(availability) }}%
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-label">
+                Total Checks
+            </div>
+
+            <div class="analytics-value">
+
+                {{ total_checks }}
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-label">
+                Successful
+            </div>
+
+            <div class="analytics-value green">
+
+                {{ successful_checks }}
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-label">
+                Failed
+            </div>
+
+            <div class="analytics-value red">
+
+                {{ failed_checks }}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= AVAILABILITY ================= -->
+
+    <section class="panel">
+
+        <div class="section-label">
+            RELIABILITY
+        </div>
+
+        <h2>
+            Availability
+        </h2>
+
+        <p>
+            Percentage of monitoring checks where the API
+            returned a successful response.
+        </p>
+
+
+        <div class="availability-container">
+
+            <div class="availability-header">
+
+                <span>
+                    Current availability
+                </span>
+
+                <strong>
+                    {{ "%.2f"|format(availability) }}%
+                </strong>
+
+            </div>
+
+
+            <!--
+                Using progress instead of inline CSS.
+                No style="width: {{ availability }}%;" required.
+            -->
+
+            <progress
+                class="availability-progress"
+                value="{{ availability }}"
+                max="100">
+
+                {{ "%.2f"|format(availability) }}%
+
+            </progress>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RESPONSE TIME ================= -->
+
+    <section class="panel">
+
+        <div class="section-label">
+            PERFORMANCE
+        </div>
+
+        <h2>
+            Average Response Time
+        </h2>
+
+        {% if average_response_time is not none %}
+
+            <p>
+
+                The average response time across successful
+                monitoring checks is
+
+                <strong>
+
+                    {{ "%.2f"|format(average_response_time) }}
+
+                    ms
+
+                </strong>.
+
+            </p>
+
+        {% else %}
+
+            <p>
+                No successful response-time data is available yet.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ================= ACTIONS ================= -->
+
+    <section class="panel">
+
+        <div class="page-actions">
+
+            <a href="/check/{{ api['id'] }}"
+               class="primary-button">
+
+                Check API Now
+
+            </a>
+
+
+            <a href="/history/{{ api['id'] }}"
+               class="secondary-button">
+
+                View History
+
+            </a>
+
+
+            <a href="/"
+               class="back-button">
+
+                ← Dashboard
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <footer class="footer">
+
+        <span>
+            API Health & Reliability Monitor
+        </span>
+
+        <span>
+            Flask · SQLite · Python
+        </span>
+
+    </footer>
+
+
+</main>
+
+</body>
+
+</html>

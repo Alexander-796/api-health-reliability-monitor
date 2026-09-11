@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ api["name"] }} | History
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+
+            <div class="brand-icon">
+                ◉
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    API Monitor
+                </div>
+
+                <div class="brand-subtitle">
+                    Reliability Dashboard
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="/check-all" class="nav-link">
+                Check All
+            </a>
+
+        </div>
+
+
+        <div class="system-status">
+
+            <span class="online-dot"></span>
+
+            System Online
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main-container">
+
+
+    <!-- HEADER -->
+
+    <section class="page-header">
+
+        <div class="eyebrow">
+            MONITORING HISTORY
+        </div>
+
+        <h1>
+            {{ api["name"] }}
+        </h1>
+
+        <p>
+            Historical health and performance records
+            for {{ api["url"] }}
+        </p>
+
+    </section>
+
+
+    <!-- ================= HISTORY TABLE ================= -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="section-label">
+                    CHECK RECORDS
+                </div>
+
+                <h2>
+                    Monitoring History
+                </h2>
+
+                <p>
+                    Previous health checks performed on this API.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if history_records %}
+
+        <div class="table-wrapper">
+
+            <table class="api-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>CHECKED AT</th>
+                        <th>STATUS</th>
+                        <th>RESPONSE TIME</th>
+                        <th>HTTP STATUS</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for record in history_records %}
+
+                    <tr>
+
+
+                        <!-- TIME -->
+
+                        <td>
+
+                            {{ record["checked_at"] }}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if record["status"] == "UP" %}
+
+                                <span class="status-badge operational">
+
+                                    <span class="status-dot"></span>
+
+                                    Operational
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge down">
+
+                                    <span class="status-dot"></span>
+
+                                    Down
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- RESPONSE -->
+
+                        <td>
+
+                            {% if record["response_time"] is not none %}
+
+                                <span class="response-time">
+
+                                    {{ "%.2f"|format(record["response_time"]) }}
+
+                                </span>
+
+                                <span class="unit">
+                                    ms
+                                </span>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- HTTP -->
+
+                        <td>
+
+                            {% if record["status_code"] %}
+
+                                <span class="http-code">
+
+                                    {{ record["status_code"] }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                ◷
+            </div>
+
+            <h3>
+                No monitoring history
+            </h3>
+
+            <p>
+                Run a health check to create the first monitoring record.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ACTIONS -->
+
+        <div class="page-actions">
+
+            <a href="/check/{{ api['id'] }}"
+               class="primary-button">
+
+                Check API Now
+
+            </a>
+
+
+            <a href="/analytics/{{ api['id'] }}"
+               class="secondary-button">
+
+                View Analytics
+
+            </a>
+
+
+            <a href="/"
+               class="back-button">
+
+                ← Dashboard
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <footer class="footer">
+
+        <span>
+            API Health & Reliability Monitor
+        </span>
+
+        <span>
+            Flask · SQLite · Python
+        </span>
+
+    </footer>
+
+
+</main>
+
+</body>
+
+</html>
